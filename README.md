@@ -210,33 +210,6 @@ NEXT_PUBLIC_API_URL=http://localhost:5001
 
 ---
 
-## 📸 Screenshots
-
-### Essential Screenshots (Recommended)
-
-1. **Login/Signup Page** - Entry point showing authentication interface
-2. **Admin Dashboard** - Admin interface with groups list and management
-3. **Group Chat Interface** - Main chat feature with messages and controls
-
-### Additional Screenshots (Optional but Recommended)
-
-4. **File Sharing** - File upload and shared file display
-5. **Theme Selection** - Theme customization dialog and applied themes
-6. **Auto-Delete Messages** - Auto-delete timer and countdown display
-7. **Block/Report Dialogs** - User management and safety features
-8. **Admin Inbox (Chatbot)** - Admin-user direct messaging interface
-
-> **Note:** To add screenshots, create a `screenshots/` folder in the project root and add images there. Then reference them in this section using markdown image syntax: `![Description](./screenshots/image-name.png)`
-
-**Example:**
-```markdown
-![Login Page](./screenshots/login.png)
-![Admin Dashboard](./screenshots/admin-dashboard.png)
-![Group Chat](./screenshots/group-chat.png)
-```
-
----
-
 ## 📖 Usage Guide
 
 ### For Admins
