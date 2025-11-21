@@ -202,58 +202,17 @@ export default function GroupChatPage() {
     }
   };
 
-  const fetchAllUsersFromMessages = async () => {
-    try {
-      const response = await api.get(`/messages/group/${groupId}`);
-      const userMap = new Map<string, string>();
-      
-      // Check if admin sent messages and get admin ID once
-      const hasAdminMessages = response.data.messages.some((msg: any) => msg.anonymousName === 'Admin');
-      if (hasAdminMessages) {
-        try {
-          const adminResponse = await api.get('/auth/admin-id');
-          userMap.set(adminResponse.data.adminId, 'Admin');
-        } catch (err) {
-          userMap.set('admin', 'Admin');
-        }
-      }
-      
-      // Add all users from messages
-      response.data.messages.forEach((msg: any) => {
-        if (msg.userId) {
-          userMap.set(msg.userId.toString(), msg.anonymousName);
-        }
-      });
-      
-      // Add group members
-      if (group?.members) {
-        group.members.forEach((m: any) => {
-          if (m.userId) {
-            userMap.set(m.userId.toString(), m.anonymousName);
-          }
-        });
-      }
-      
-      const users = Array.from(userMap.entries()).map(([userId, anonymousName]) => ({
-        userId,
-        anonymousName
-      }));
-      
-      setAllUsersInGroup(users);
-    } catch (err: any) {
-      console.error('Failed to fetch users from messages:', err);
-    }
-  };
-
   const fetchBlockedUsers = async () => {
     try {
       // Get users I have blocked
       const blockedResponse = await api.get('/block/blocked');
-      const blockedSet = new Set(blockedResponse.data.blockedUsers.map((b: any) => b.blockedUserId));
-      
-      // Get users who blocked me
+      const blockedSet = new Set<string>(
+        blockedResponse.data.blockedUsers.map((b: any) => b.blockedUserId.toString())
+      );
+  
+      // MUST be typed as Set<string>
       const usersWhoBlockedMeSet = new Set<string>();
-      
+  
       // Check each user in the group to see if they blocked me
       if (group?.members && user?.id) {
         for (const member of group.members) {
@@ -269,42 +228,53 @@ export default function GroupChatPage() {
           }
         }
       }
-      
+  
       // Check if admin blocked me
       try {
         const adminResponse = await api.get('/auth/admin-id');
         const adminId = adminResponse.data.adminId;
+  
         const adminCheck = await api.get(`/block/check/${adminId}`);
+  
         if (adminCheck.data.blockedByThem) {
-          usersWhoBlockedMeSet.add(adminId);
-          usersWhoBlockedMeSet.add('admin');
+          usersWhoBlockedMeSet.add(adminId.toString());
+          usersWhoBlockedMeSet.add('admin'); // Special case
         }
       } catch (err) {
-        // Continue
+        // Ignore
       }
-      
+  
+      // Now update states
       setBlockedUsers(blockedSet);
       setUsersWhoBlockedMe(usersWhoBlockedMeSet);
-      
-      // Build blocked users list for dialog
-      const blockedList: Array<{userId: string, anonymousName: string}> = [];
+  
+      // Build blocked-users list for dialog
+      const blockedList: Array<{ userId: string; anonymousName: string }> = [];
+  
       for (const blockedUserId of blockedSet) {
-        const found = allUsersInGroup.find(u => u.userId === blockedUserId) ||
-                     group?.members?.find((m: any) => m.userId && m.userId.toString() === blockedUserId);
+        const found =
+          allUsersInGroup.find((u) => u.userId === blockedUserId) ||
+          group?.members?.find(
+            (m: any) =>
+              m.userId && m.userId.toString() === blockedUserId
+          );
+  
         if (found) {
-          blockedList.push({ 
-            userId: blockedUserId, 
-            anonymousName: found.anonymousName || found.anonymousName 
+          blockedList.push({
+            userId: blockedUserId,
+            anonymousName: found.anonymousName,
           });
-        } else if (blockedUserId === 'admin' || blockedUserId.includes('admin')) {
-          blockedList.push({ userId: blockedUserId, anonymousName: 'Admin' });
+        } else if (blockedUserId === 'admin') {
+          blockedList.push({ userId: 'admin', anonymousName: 'Admin' });
         }
       }
+  
       setBlockedUsersList(blockedList);
-    } catch (err: any) {
+    } catch (err) {
       console.error('Failed to fetch blocked users:', err);
     }
   };
+  
 
   const handleBlockUser = async (userId: string) => {
     try {
