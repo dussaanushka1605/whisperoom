@@ -363,9 +363,11 @@ setInterval(async () => {
 }, 60000); // Run every minute
 
 const PORT = process.env.PORT || 5001;
+
 server.listen(PORT, () => {
-  console.log(`✅ Server running on port ${PORT}`);
-  console.log(`✅ API available at http://localhost:${PORT}/api`);
-  console.log(`✅ Health check: http://localhost:${PORT}/health`);
+    console.log(`✅ Server running on port ${PORT}`);
+    console.log(`🌐 API available at /api`);
+    console.log(`💓 Health check at /health`);
 });
+
 
