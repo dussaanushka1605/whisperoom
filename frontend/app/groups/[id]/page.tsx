@@ -1,4 +1,8 @@
 'use client';
+<<<<<<< HEAD
+=======
+
+>>>>>>> e9b0ee91b1931815926fc2c8436ddf575b905039
 import { useEffect, useState, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
@@ -17,7 +21,10 @@ import { Textarea } from '@/components/ui/textarea';
 import EmojiPicker, { EmojiClickData } from 'emoji-picker-react';
 import { toast } from 'sonner';
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> e9b0ee91b1931815926fc2c8436ddf575b905039
 interface Message {
   _id: string;
   anonymousName: string;
@@ -110,6 +117,7 @@ export default function GroupChatPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const fileInput = useRef<HTMLInputElement>(null);
+<<<<<<< HEAD
   // Helper to keep `allUsersInGroup` in sync with currently loaded messages.
   // This is used mainly for dialogs (e.g. blocked users) where we need to
   // resolve a userId/anonymousName even if they are not present in the
@@ -133,6 +141,8 @@ export default function GroupChatPage() {
       return Array.from(userMap.values());
     });
   };
+=======
+>>>>>>> e9b0ee91b1931815926fc2c8436ddf575b905039
 
   useEffect(() => {
     if (!loading && !user) {
@@ -149,22 +159,33 @@ export default function GroupChatPage() {
       initialize();
       setupSocket();
     }
+<<<<<<< HEAD
+=======
+
+>>>>>>> e9b0ee91b1931815926fc2c8436ddf575b905039
     return () => {
       const socket = getSocket();
       if (socket) {
         socket.emit('leave-group', groupId);
       }
     };
+<<<<<<< HEAD
   }, [loading, user, groupId, router]);
+=======
+  }, [user, loading, groupId, router]);
+>>>>>>> e9b0ee91b1931815926fc2c8436ddf575b905039
 
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
+<<<<<<< HEAD
   useEffect(() => {
     fetchAllUsersFromMessages();
   }, [messages]);
 
+=======
+>>>>>>> e9b0ee91b1931815926fc2c8436ddf575b905039
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -276,15 +297,24 @@ export default function GroupChatPage() {
   
       // Build blocked-users list for dialog
       const blockedList: Array<{ userId: string; anonymousName: string }> = [];
+<<<<<<< HEAD
 
       Array.from(blockedSet).forEach((blockedUserId) => {
+=======
+  
+      for (const blockedUserId of blockedSet) {
+>>>>>>> e9b0ee91b1931815926fc2c8436ddf575b905039
         const found =
           allUsersInGroup.find((u) => u.userId === blockedUserId) ||
           group?.members?.find(
             (m: any) =>
               m.userId && m.userId.toString() === blockedUserId
           );
+<<<<<<< HEAD
 
+=======
+  
+>>>>>>> e9b0ee91b1931815926fc2c8436ddf575b905039
         if (found) {
           blockedList.push({
             userId: blockedUserId,
@@ -293,7 +323,11 @@ export default function GroupChatPage() {
         } else if (blockedUserId === 'admin') {
           blockedList.push({ userId: 'admin', anonymousName: 'Admin' });
         }
+<<<<<<< HEAD
       });
+=======
+      }
+>>>>>>> e9b0ee91b1931815926fc2c8436ddf575b905039
   
       setBlockedUsersList(blockedList);
     } catch (err) {
@@ -312,6 +346,7 @@ export default function GroupChatPage() {
       
       await api.post('/block/block', { userId: targetUserId });
       toast.success('User blocked successfully');
+<<<<<<< HEAD
       setBlockedUsers(prev => {
         const newSet = new Set(prev);
         newSet.add(targetUserId);
@@ -323,6 +358,11 @@ export default function GroupChatPage() {
           newSet.add('admin');
           return newSet;
         });
+=======
+      setBlockedUsers(prev => new Set([...prev, targetUserId]));
+      if (userId === 'admin') {
+        setBlockedUsers(prev => new Set([...prev, 'admin']));
+>>>>>>> e9b0ee91b1931815926fc2c8436ddf575b905039
       }
       await fetchBlockedUsers();
       fetchMessages(); // Reload messages to hide blocked user's messages
@@ -893,6 +933,10 @@ export default function GroupChatPage() {
                   </div>
                 </DialogContent>
               </Dialog>
+<<<<<<< HEAD
+=======
+            )}
+>>>>>>> e9b0ee91b1931815926fc2c8436ddf575b905039
           </div>
         </div>
       </div>
