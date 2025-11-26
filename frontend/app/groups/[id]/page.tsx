@@ -111,6 +111,26 @@ export default function GroupChatPage() {
   const inputRef = useRef<HTMLInputElement>(null);
   const fileInput = useRef<HTMLInputElement>(null);
 
+
+  const fetchAllUsersFromMessages = () => {
+    setAllUsersInGroup((prev) => {
+      const userMap = new Map(prev.map((u) => [u.userId, u]));
+
+      messages.forEach((message) => {
+        if (message.userId) {
+          const userId = message.userId.toString();
+          if (!userMap.has(userId)) {
+            userMap.set(userId, {
+              userId,
+              anonymousName: message.anonymousName,
+            });
+          }
+        }
+      });
+
+      return Array.from(userMap.values());
+    });
+  };
   // Helper to keep `allUsersInGroup` in sync with currently loaded messages.
   // This is used mainly for dialogs (e.g. blocked users) where we need to
   // resolve a userId/anonymousName even if they are not present in the
