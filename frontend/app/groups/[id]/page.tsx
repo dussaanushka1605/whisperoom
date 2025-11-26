@@ -1,5 +1,4 @@
 'use client';
-
 import { useEffect, useState, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
@@ -17,6 +16,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import EmojiPicker, { EmojiClickData } from 'emoji-picker-react';
 import { toast } from 'sonner';
+
 
 interface Message {
   _id: string;
@@ -110,27 +110,6 @@ export default function GroupChatPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const fileInput = useRef<HTMLInputElement>(null);
-
-
-  const fetchAllUsersFromMessages = () => {
-    setAllUsersInGroup((prev) => {
-      const userMap = new Map(prev.map((u) => [u.userId, u]));
-
-      messages.forEach((message) => {
-        if (message.userId) {
-          const userId = message.userId.toString();
-          if (!userMap.has(userId)) {
-            userMap.set(userId, {
-              userId,
-              anonymousName: message.anonymousName,
-            });
-          }
-        }
-      });
-
-      return Array.from(userMap.values());
-    });
-  };
   // Helper to keep `allUsersInGroup` in sync with currently loaded messages.
   // This is used mainly for dialogs (e.g. blocked users) where we need to
   // resolve a userId/anonymousName even if they are not present in the
@@ -170,17 +149,20 @@ export default function GroupChatPage() {
       initialize();
       setupSocket();
     }
-
     return () => {
       const socket = getSocket();
       if (socket) {
         socket.emit('leave-group', groupId);
       }
     };
-  }, [user, loading, groupId, router]);
+  }, [loading, user, groupId, router]);
 
   useEffect(() => {
     scrollToBottom();
+  }, [messages]);
+
+  useEffect(() => {
+    fetchAllUsersFromMessages();
   }, [messages]);
 
   const scrollToBottom = () => {
@@ -294,15 +276,15 @@ export default function GroupChatPage() {
   
       // Build blocked-users list for dialog
       const blockedList: Array<{ userId: string; anonymousName: string }> = [];
-  
-      for (const blockedUserId of blockedSet) {
+
+      Array.from(blockedSet).forEach((blockedUserId) => {
         const found =
           allUsersInGroup.find((u) => u.userId === blockedUserId) ||
           group?.members?.find(
             (m: any) =>
               m.userId && m.userId.toString() === blockedUserId
           );
-  
+
         if (found) {
           blockedList.push({
             userId: blockedUserId,
@@ -311,7 +293,7 @@ export default function GroupChatPage() {
         } else if (blockedUserId === 'admin') {
           blockedList.push({ userId: 'admin', anonymousName: 'Admin' });
         }
-      }
+      });
   
       setBlockedUsersList(blockedList);
     } catch (err) {
@@ -330,9 +312,17 @@ export default function GroupChatPage() {
       
       await api.post('/block/block', { userId: targetUserId });
       toast.success('User blocked successfully');
-      setBlockedUsers(prev => new Set([...prev, targetUserId]));
+      setBlockedUsers(prev => {
+        const newSet = new Set(prev);
+        newSet.add(targetUserId);
+        return newSet;
+      });
       if (userId === 'admin') {
-        setBlockedUsers(prev => new Set([...prev, 'admin']));
+        setBlockedUsers(prev => {
+          const newSet = new Set(prev);
+          newSet.add('admin');
+          return newSet;
+        });
       }
       await fetchBlockedUsers();
       fetchMessages(); // Reload messages to hide blocked user's messages
@@ -903,7 +893,6 @@ export default function GroupChatPage() {
                   </div>
                 </DialogContent>
               </Dialog>
-            )}
           </div>
         </div>
       </div>

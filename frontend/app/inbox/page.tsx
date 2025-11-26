@@ -399,7 +399,7 @@ export default function AdminInboxPage() {
                           </p>
                           {inboxUser.latestMessage && (
                             <p className="text-xs text-muted-foreground truncate mt-1">
-                              {inboxUser.latestMessage.messageText || inboxUser.latestMessage.content}
+                              {inboxUser.latestMessage.content}
                             </p>
                           )}
                         </div>

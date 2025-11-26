@@ -23,6 +23,7 @@ interface InboxMessage {
   messageText: string;
   isRead: boolean;
   createdAt: string;
+  userId?: string;
 }
 
 export default function UserInboxPage() {
@@ -74,8 +75,8 @@ export default function UserInboxPage() {
 
     socket.off('new-inbox-message');
     socket.on('new-inbox-message', (message: InboxMessage) => {
-      // Only add if it's for this user or from admin
-      if (message.userId === user?.id || message.senderType === 'admin') {
+      // Add messages relevant to this inbox; filter admin messages if blocked
+      if (message.senderType === 'admin' || message.senderType === 'user') {
         // Use ref to check current block status (not closure state)
         if (hasBlockedAdminRef.current && message.senderType === 'admin') {
           return; // Don't add admin messages if blocked
@@ -101,7 +102,7 @@ export default function UserInboxPage() {
 
     socket.off('inbox-message-sent');
     socket.on('inbox-message-sent', (message: InboxMessage) => {
-      if (message.userId === user?.id) {
+      {
         setMessages((prev) => {
           const filtered = prev.filter(m => 
             !m._id?.toString().startsWith('temp-') || m.messageText !== message.messageText
