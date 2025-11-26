@@ -399,11 +399,7 @@ export default function AdminInboxPage() {
                           </p>
                           {inboxUser.latestMessage && (
                             <p className="text-xs text-muted-foreground truncate mt-1">
-<<<<<<< HEAD
                               {inboxUser.latestMessage.content}
-=======
-                              {inboxUser.latestMessage.messageText || inboxUser.latestMessage.content}
->>>>>>> e9b0ee91b1931815926fc2c8436ddf575b905039
                             </p>
                           )}
                         </div>
